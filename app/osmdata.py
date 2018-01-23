@@ -7,6 +7,8 @@ files.
 """
 
 from lxml import etree
+from urllib.parse import urlencode
+from urllib.request import urlopen
 
 
 
@@ -140,6 +142,15 @@ def load_osm_file(osmfile):
                 osm.relations.update({elem.get("id"): relation})
             currenttag = None
             root.clear()
+    return osm
+
+def load_overpass(qlfile):
+    """Load OSM data from an Overpass API query."""
+    osm = OSMData()
+    url = "http://overpass-api.de/api/interpreter"
+    postdata = urlencode({"data":qlfile.read()}).encode()
+    with urlopen(url, postdata) as response:
+        osm = load_osm_file(response)
     return osm
 
 def save_osm_file(osmfile, osm):

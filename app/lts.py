@@ -29,6 +29,9 @@ class LTSAnalyzer:
         if self.options.bzip:
             with bz2.open(self.options.inputfile) as osmfile:
                 self.osm = osmdata.load_osm_file(osmfile)
+        elif self.options.overpass:
+            with open(self.options.inputfile) as qlfile:
+                self.osm = osmdata.load_overpass(qlfile)
         else:
             with open(self.options.inputfile, "rb") as osmfile:
                 self.osm = osmdata.load_osm_file(osmfile)
@@ -48,12 +51,12 @@ class LTSAnalyzer:
                     osmout.nodes.update({node: self.osm.nodes.get(node)})
 
             if(self.options.geojson):
-                with open(outputpath+self.options.prefix+
-                        str(level)+".json","w") as jsonfile:
+                with open(outputpath+"level_"+str(level)+
+                        ".json","w") as jsonfile:
                     osmdata.save_geojson_file(jsonfile, osmout)
             else:
-                with open(outputpath+self.options.prefix+
-                        str(level)+".osm","wb") as osmfile:
+                with open(outputpath+"level_"+str(level)+
+                        ".osm","wb") as osmfile:
                     osmdata.save_osm_file(osmfile, osmout)
 
     def run(self):
@@ -145,11 +148,12 @@ class LTSAnalyzer:
 if __name__ == "__main__":
     """Main method for running the module from the command line."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("inputfile", help="OpenStreetMap XML file")
-    parser.add_argument("--bzip", help="read input from a bzip2-compressed"
-            " OSM XML file", action="store_true")
-    parser.add_argument("--prefix", help="set prefix for results files"
-            " (default is \"level_\")", type=str, default="level_")
+    parser.add_argument("inputfile", help="OpenStreetMap data source (default"
+            " is OSM XML file)")
+    parser.add_argument("--bzip", help="input file is a bzip2-compressed OSM"
+            " XML file", action="store_true")
+    parser.add_argument("--overpass", help="input file is an Overpass API"
+            " query file", action="store_true")
     parser.add_argument("--geojson", help="write results files in GeoJSON"
             " format (default is OSM XML)", action="store_true")
     parser.add_argument("--verbose", help="enable verbose output",
