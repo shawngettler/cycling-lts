@@ -116,10 +116,8 @@ class LTSAnalyzer:
                 maxspeed = way.tags.get("maxspeed")
                 if "maxspeed" == "national":
                     return 40
-                if 'mph' in maxspeed:
-                    i = maxspeed.find('mph')
-                    # convert mph to approximate km/h
-                    return int(maxspeed[:i]) * 1.6 
+                if "mph" in maxspeed: # convert mph to approximate km/h
+                    return int(maxspeed[:maxspeed.find("mph")]) * 1.6
                 return int(maxspeed)
             if way.tags.get("highway") == "motorway":
                 return 100
